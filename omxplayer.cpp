@@ -500,7 +500,27 @@ int main(int argc, char *argv[]){
 
   g_RBP.Initialize();
   g_OMX.Initialize();
+  m_av_clock = new OMXClock();
+  if(!m_av_clock->OMXInitialize())
+  {
+    printf("clock is not initialized\n");
+    return 0;
+  }
+  if(!m_av_clock->HDMIClockSync())
+  {
+    printf("HDMIClockSync\n");
+    return 0;
+  }
 
+  if(!m_player_video.Open(m_av_clock, m_config_video))
+  {
+    printf("m_player_video.Open\n");
+    return 0;
+  }
+
+  m_av_clock->OMXStateIdle();
+  m_av_clock->OMXStop();
+  m_av_clock->OMXPause();
   if(!m_omx_reader.Open("/opt/vc/src/hello_pi/hello_video/test.h264", false))
   {
     printf("can't open file\n");
