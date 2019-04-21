@@ -495,6 +495,12 @@ static void blank_background(uint32_t rgba)
 
 int main(int argc, char *argv[]){
   printf("agugu\n");
+  CRBP                  g_RBP;
+  COMXCore              g_OMX;
+
+  g_RBP.Initialize();
+  g_OMX.Initialize();
+
   if(!m_omx_reader.Open("/opt/vc/src/hello_pi/hello_video/test.h264", false))
   {
     printf("can't open file\n");
@@ -504,5 +510,9 @@ int main(int argc, char *argv[]){
       usleep(10000);
     }
   }
+
+  g_OMX.Deinitialize();
+  g_RBP.Deinitialize();
+
   return 0;
 }
