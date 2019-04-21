@@ -493,7 +493,12 @@ static void blank_background(uint32_t rgba)
   assert( ret == 0 );
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]){
+  printf("agugu\n");
+  return 0;
+}
+
+int main1(int argc, char *argv[])
 {
   signal(SIGSEGV, sig_handler);
   signal(SIGABRT, sig_handler);
