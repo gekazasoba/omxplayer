@@ -500,6 +500,9 @@ int main(int argc, char *argv[]){
     printf("can't open file\n");
   } else {
     printf("opened\n");
+    while (true){
+      usleep(10000);
+    }
   }
   return 0;
 }
