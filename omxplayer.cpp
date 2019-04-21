@@ -495,7 +495,7 @@ static void blank_background(uint32_t rgba)
 
 int main(int argc, char *argv[]){
   printf("agugu\n");
-  if(!m_omx_reader.Open("/opt/vc/src/hello_pi/hello_video/test.h264", false));
+  if(!m_omx_reader.Open("/opt/vc/src/hello_pi/hello_video/test.h264", false))
   {
     printf("can't open file\n");
   } else {
