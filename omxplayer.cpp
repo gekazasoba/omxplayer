@@ -401,20 +401,6 @@ bool Exists(const std::string& path)
   return !error || errno != ENOENT;
 }
 
-bool IsURL(const std::string& str)
-{
-  auto result = str.find("://");
-  if(result == std::string::npos || result == 0)
-    return false;
-
-  for(size_t i = 0; i < result; ++i)
-  {
-    if(!isalpha(str[i]))
-      return false;
-  }
-  return true;
-}
-
 bool IsPipe(const std::string& str)
 {
   if (str.compare(0, 5, "pipe:") == 0)
@@ -532,38 +518,7 @@ int main(int argc, char *argv[])
 
   m_filename = "/opt/vc/src/hello_pi/hello_video/test.h264";//argv[optind];
 
-  auto PrintFileNotFound = [](const std::string& path)
-  {
-      printf("File \"%s\" not found.\n", path.c_str());
-  };
-
-  bool filename_is_URL = IsURL(m_filename);
-
-  if(!filename_is_URL && !IsPipe(m_filename) && !Exists(m_filename))
-  {
-    PrintFileNotFound(m_filename);
-    return EXIT_FAILURE;
-  }
-
-  if(m_asked_for_font && !Exists(m_font_path))
-  {
-    PrintFileNotFound(m_font_path);
-    return EXIT_FAILURE;
-  }
-
-  if(m_asked_for_italic_font && !Exists(m_italic_font_path))
-  {
-    PrintFileNotFound(m_italic_font_path);
-    return EXIT_FAILURE;
-  }
-
-  if(m_has_external_subtitles && !Exists(m_external_subtitles_path))
-  {
-    PrintFileNotFound(m_external_subtitles_path);
-    return EXIT_FAILURE;
-  }
-
-  if(!m_has_external_subtitles && !filename_is_URL)
+  if(!m_has_external_subtitles)
   {
     auto subtitles_path = m_filename.substr(0, m_filename.find_last_of(".")) +
                           ".srt";
