@@ -267,7 +267,6 @@ int main(int argc, char *argv[])
   std::string           m_filename;
   CRBP                  g_RBP;
   COMXCore              g_OMX;
-  double                startpts              = 0;
   uint32_t              m_blank_background    = 0;
   float m_threshold      = -1.0f; // amount of audio/video required to come out of buffering
   float m_timeout        = 10.0f; // amount of time file/network operation can stall for before timing out
@@ -278,8 +277,6 @@ int main(int argc, char *argv[])
 
   double m_last_check_time = 0.0;
   float m_latency = 0.0f;
-  int c;
-  std::string mode;
 
   //m_filename = "/opt/vc/src/hello_pi/hello_video/test.h264";//argv[optind];
   m_filename = "/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4";
@@ -313,8 +310,6 @@ int main(int argc, char *argv[])
     printf("Only %dM of gpu_mem is configured. Try running \"sudo raspi-config\" and ensure that \"memory_split\" has a value of %d or greater\n", gpu_mem, min_gpu_mem);
 
   m_av_clock = new OMXClock();
-  change_file:
-
   if(!m_omx_reader.Open(m_filename.c_str(), false, m_config_audio.is_live, m_timeout))
     goto do_exit;
 
@@ -404,11 +399,6 @@ int main(int argc, char *argv[])
     {
       update = true;
       m_last_check_time = now;
-    }
-
-    if (update) {
-      OMXControlResult result = KeyConfig::ACTION_BLANK;
-      double oldPos, newPos;
     }
 
     /* player got in an error state */
