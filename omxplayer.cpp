@@ -228,7 +228,7 @@ void cleanup() {
   g_RBP.Deinitialize();
 }
 
-void init() {
+bool init() {
   signal(SIGSEGV, sig_handler);
   signal(SIGABRT, sig_handler);
   signal(SIGFPE, sig_handler);
@@ -322,6 +322,7 @@ void init() {
 
   m_av_clock->OMXReset(m_has_video, m_has_audio);
   m_av_clock->OMXStateExecute();
+  return true;
 }
 
 bool spin(){
@@ -489,17 +490,13 @@ bool spin(){
 
 int main(int argc, char *argv[])
 {
-  init();
+  if (!init())
+    return EXIT_FAILURE;
 
   bool ok = spin();
   cleanup();
 
   printf("have a nice day ;)\n");
 
-  // exit status success on playback end
-  if (ok)
-    return EXIT_SUCCESS;
-
-  // exit status failure on other cases
-  return EXIT_FAILURE;
+  return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
