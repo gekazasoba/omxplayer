@@ -304,7 +304,6 @@ int main(int argc, char *argv[])
   COMXCore              g_OMX;
   double                startpts              = 0;
   uint32_t              m_blank_background    = 0;
-  bool sentStarted = false;
   float m_threshold      = -1.0f; // amount of audio/video required to come out of buffering
   float m_timeout        = 10.0f; // amount of time file/network operation can stall for before timing out
   int m_orientation      = -1; // unset
@@ -444,7 +443,6 @@ int main(int argc, char *argv[])
 
   m_av_clock->OMXReset(m_has_video, m_has_audio);
   m_av_clock->OMXStateExecute();
-  sentStarted = true;
 
   while(!m_stop)
   {
@@ -596,12 +594,6 @@ int main(int argc, char *argv[])
           m_av_clock->OMXPause();
         }
       }
-    }
-    if (!sentStarted)
-    {
-      CLog::Log(LOGDEBUG, "COMXPlayer::HandleMessages - player started RESET");
-      m_av_clock->OMXReset(m_has_video, m_has_audio);
-      sentStarted = true;
     }
 
     if(!m_omx_pkt)
