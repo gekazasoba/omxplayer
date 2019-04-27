@@ -157,36 +157,6 @@ static void FlushStreams(double pts)
   }
 }
 
-
-void SetVideoMode(int width, int height, int fpsrate, int fpsscale, FORMAT_3D_T is3d)
-{
-  int32_t num_modes = 0;
-  int i;
-  HDMI_RES_GROUP_T prefer_group;
-  HDMI_RES_GROUP_T group = HDMI_RES_GROUP_CEA;
-  float fps = 60.0f; // better to force to higher rate if no information is known
-  uint32_t prefer_mode;
-
-  if (fpsrate && fpsscale)
-    fps = DVD_TIME_BASE / OMXReader::NormalizeFrameduration((double)DVD_TIME_BASE * fpsscale / fpsrate);
-
-  //Supported HDMI CEA/DMT resolutions, preferred resolution will be returned
-  TV_SUPPORTED_MODE_NEW_T *supported_modes = NULL;
-  // query the number of modes first
-  int max_supported_modes = m_BcmHost.vc_tv_hdmi_get_supported_modes_new(group, NULL, 0, &prefer_group, &prefer_mode);
-
-  if (max_supported_modes > 0)
-    supported_modes = new TV_SUPPORTED_MODE_NEW_T[max_supported_modes];
-
-  if (supported_modes)
-  {
-    num_modes = m_BcmHost.vc_tv_hdmi_get_supported_modes_new(group,
-                                                             supported_modes, max_supported_modes, &prefer_group, &prefer_mode);
-  }
-  if (supported_modes)
-    delete[] supported_modes;
-}
-
 static int get_mem_gpu(void)
 {
   char response[80] = "";
