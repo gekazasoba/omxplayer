@@ -70,14 +70,6 @@ enum PCMChannels  *m_pChannelMap        = NULL;
 volatile sig_atomic_t g_abort           = false;
 long              m_Volume              = 0;
 long              m_Amplification       = 0;
-bool              m_HWDecode            = false;
-bool              m_osd                 = true;
-bool              m_asked_for_font      = false;
-bool              m_asked_for_italic_font = false;
-float             m_font_size           = 0.055f;
-bool              m_centered            = false;
-bool              m_ghost_box           = true;
-unsigned int      m_subtitle_lines      = 3;
 bool              m_Pause               = false;
 OMXReader         m_omx_reader;
 int               m_audio_index_use     = 0;
@@ -85,7 +77,6 @@ OMXClock          *m_av_clock           = NULL;
 OMXAudioConfig    m_config_audio;
 OMXVideoConfig    m_config_video;
 OMXPacket         *m_omx_pkt            = NULL;
-bool              m_no_hdmi_clock_sync  = false;
 bool              m_stop                = false;
 DllBcmHost        m_BcmHost;
 OMXPlayerVideo    m_player_video;
@@ -109,8 +100,6 @@ void sig_handler(int s)
   signal(SIGFPE, SIG_DFL);
   abort();
 }
-
-static void FlushStreams(double pts);
 
 static void SetSpeed(int iSpeed)
 {
@@ -292,7 +281,8 @@ int main(int argc, char *argv[])
   int c;
   std::string mode;
 
-  m_filename = "/opt/vc/src/hello_pi/hello_video/test.h264";//argv[optind];
+  //m_filename = "/opt/vc/src/hello_pi/hello_video/test.h264";//argv[optind];
+  m_filename = "/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4";
 
   bool m_audio_extension = false;
   const CStdString m_musicExtensions = ".nsv|.m4a|.flac|.aac|.strm|.pls|.rm|.rma|.mpa|.wav|.wma|.ogg|.mp3|.mp2|.m3u|.mod|.amf|.669|.dmf|.dsm|.far|.gdm|"
