@@ -26,7 +26,6 @@
 #include <sys/ioctl.h>
 #include <getopt.h>
 #include <string.h>
-#include "Consts.hh"
 
 #define AV_NOWARN_DEPRECATED
 
@@ -58,6 +57,8 @@ extern "C" {
 #include "Srt.h"
 #include "KeyConfig.h"
 #include "utils/Strprintf.h"
+#include "Consts.hh"
+#include "Tools.hh"
 
 #include <string>
 #include <utility>
@@ -80,8 +81,6 @@ OMXPlayerVideo    m_player_video;
 OMXPlayerAudio    m_player_audio;
 bool              m_has_video           = false;
 bool              m_has_audio           = false;
-
-enum{ERROR=-1,SUCCESS,ONEBYTE};
 
 void sig_handler(int s)
 {
@@ -146,14 +145,6 @@ static void FlushStreams(double pts)
   }
 }
 
-static int get_mem_gpu(void)
-{
-  char response[80] = "";
-  int gpu_mem = 0;
-  if (vc_gencmd(response, sizeof response, "get_mem gpu") == 0)
-    vc_gencmd_number_property(response, "gpu", &gpu_mem);
-  return gpu_mem;
-}
 
 static void blank_background(uint32_t rgba)
 {
@@ -213,8 +204,6 @@ int main(int argc, char *argv[])
   uint32_t              m_blank_background    = 0;
   float m_threshold      = -1.0f; // amount of audio/video required to come out of buffering
   float m_timeout        = 10.0f; // amount of time file/network operation can stall for before timing out
-  int m_orientation      = -1; // unset
-  float m_fps            = 0.0f; // unset
 
 
   double m_last_check_time = 0.0;
@@ -224,10 +213,7 @@ int main(int argc, char *argv[])
   m_filename = "/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4";
 
   bool m_audio_extension = false;
-  const CStdString m_musicExtensions = ".nsv|.m4a|.flac|.aac|.strm|.pls|.rm|.rma|.mpa|.wav|.wma|.ogg|.mp3|.mp2|.m3u|.mod|.amf|.669|.dmf|.dsm|.far|.gdm|"
-                                       ".imf|.it|.m15|.med|.okt|.s3m|.stm|.sfx|.ult|.uni|.xm|.sid|.ac3|.dts|.cue|.aif|.aiff|.wpl|.ape|.mac|.mpc|.mp+|.mpp|.shn|.zip|.rar|"
-                                       ".wv|.nsf|.spc|.gym|.adx|.dsp|.adp|.ymf|.ast|.afc|.hps|.xsp|.xwav|.waa|.wvs|.wam|.gcm|.idsp|.mpdsp|.mss|.spt|.rsd|.mid|.kar|.sap|"
-                                       ".cmc|.cmr|.dmc|.mpt|.mpd|.rmt|.tmc|.tm8|.tm2|.oga|.url|.pxml|.tta|.rss|.cm3|.cms|.dlt|.brstm|.mka";
+
   if (m_filename.find_last_of(".") != string::npos)
   {
     CStdString extension = m_filename.substr(m_filename.find_last_of("."));
@@ -274,9 +260,6 @@ int main(int argc, char *argv[])
   m_omx_reader.GetHints(OMXSTREAM_AUDIO, m_config_audio.hints);
   m_omx_reader.GetHints(OMXSTREAM_VIDEO, m_config_video.hints);
 
-  if (m_fps > 0.0f)
-    m_config_video.hints.fpsrate = m_fps * DVD_TIME_BASE, m_config_video.hints.fpsscale = DVD_TIME_BASE;
-
   // get display aspect
   TV_DISPLAY_STATE_T current_tv_state;
   memset(&current_tv_state, 0, sizeof(TV_DISPLAY_STATE_T));
@@ -290,8 +273,6 @@ int main(int argc, char *argv[])
   }
   m_config_video.display_aspect *= (float)current_tv_state.display.hdmi.height/(float)current_tv_state.display.hdmi.width;
 
-  if (m_orientation >= 0)
-    m_config_video.hints.orientation = m_orientation;
   if(m_has_video && !m_player_video.Open(m_av_clock, m_config_video))
     goto do_exit;
 
