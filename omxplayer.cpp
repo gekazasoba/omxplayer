@@ -72,9 +72,6 @@ long              m_Volume              = 0;
 long              m_Amplification       = 0;
 bool              m_HWDecode            = false;
 bool              m_osd                 = true;
-std::string       m_font_path           = "/usr/share/fonts/truetype/freefont/FreeSans.ttf";
-std::string       m_italic_font_path    = "/usr/share/fonts/truetype/freefont/FreeSansOblique.ttf";
-std::string       m_dbus_name           = "org.mpris.MediaPlayer2.omxplayer";
 bool              m_asked_for_font      = false;
 bool              m_asked_for_italic_font = false;
 float             m_font_size           = 0.055f;
@@ -111,14 +108,6 @@ void sig_handler(int s)
   signal(SIGSEGV, SIG_DFL);
   signal(SIGFPE, SIG_DFL);
   abort();
-}
-
-void print_version()
-{
-  printf("omxplayer - Commandline multimedia player for the Raspberry Pi\n");
-  printf("        Build date: %s\n", VERSION_DATE);
-  printf("        Version   : %s [%s]\n", VERSION_HASH, VERSION_BRANCH);
-  printf("        Repository: %s\n", VERSION_REPO);
 }
 
 static void FlushStreams(double pts);
@@ -276,19 +265,7 @@ static void blank_background(uint32_t rgba)
   assert( ret == 0 );
 }
 
-#define S(x) (int)(DVD_PLAYSPEED_NORMAL*(x))
-const int playspeeds[] = {
-          S(0), S(1/16.0), S(1/8.0), S(1/4.0), S(1/2.0), S(0.975)
-          , S(1.0), S(1.125), S(-32.0), S(-16.0), S(-8.0), S(-4)
-          , S(-2), S(-1), S(1), S(2.0), S(4.0), S(8.0), S(16.0), S(32.0)};
 
-const int playspeed_slow_min = 0,
-        playspeed_slow_max = 7,
-        playspeed_rew_max = 8,
-        playspeed_rew_min = 13,
-        playspeed_normal = 14,
-        playspeed_ff_min = 15,
-        playspeed_ff_max = 19;
 
 int main(int argc, char *argv[])
 {
@@ -308,14 +285,8 @@ int main(int argc, char *argv[])
   int m_orientation      = -1; // unset
   float m_fps            = 0.0f; // unset
   TV_DISPLAY_STATE_T   tv_state;
-  double last_seek_pos = 0;
-  std::string            m_cookie              = "";
-  std::string            m_user_agent          = "";
-  std::string            m_lavfdopts           = "";
-  std::string            m_avdict              = "";
 
 
-  int playspeed_current = playspeed_normal;
   double m_last_check_time = 0.0;
   float m_latency = 0.0f;
   int c;
@@ -354,7 +325,7 @@ int main(int argc, char *argv[])
   m_av_clock = new OMXClock();
   change_file:
 
-  if(!m_omx_reader.Open(m_filename.c_str(), false, m_config_audio.is_live, m_timeout, m_cookie.c_str(), m_user_agent.c_str(), m_lavfdopts.c_str(), m_avdict.c_str()))
+  if(!m_omx_reader.Open(m_filename.c_str(), false, m_config_audio.is_live, m_timeout))
     goto do_exit;
 
   m_has_video     = m_omx_reader.VideoStreamCount();
