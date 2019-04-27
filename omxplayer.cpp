@@ -81,7 +81,7 @@ class Player{
     bool              m_has_audio           = false;
 
     bool                  m_send_eos            = false;
-    std::string           m_filename = "/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4";
+    std::string           m_filename;
     CRBP                  g_RBP;
     COMXCore              g_OMX;
     uint32_t              m_blank_background    = 0;
@@ -185,6 +185,11 @@ class Player{
 
       ret = vc_dispmanx_update_submit_sync( update );
       assert( ret == 0 );
+    }
+
+public:
+    Player(std::string fileName) m_filename(fileName) {
+
     }
 
 public:
@@ -469,7 +474,7 @@ public:
 
 int main(int argc, char *argv[])
 {
-  Player player;
+  Player player("/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4");
   if (!player.init())
     return EXIT_FAILURE;
 
