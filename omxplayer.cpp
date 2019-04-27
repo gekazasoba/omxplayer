@@ -608,7 +608,7 @@ int main(int argc, char *argv[])
   //Build default keymap just in case the --key-config option isn't used
   map<int,int> keymap = KeyConfig::buildDefaultKeymap();
 
-  while ((c = getopt_long(argc, argv, "wiIhvkn:l:o:cslb::pd3:Myzt:rg", longopts, NULL)) != -1)
+  /*while ((c = getopt_long(argc, argv, "wiIhvkn:l:o:cslb::pd3:Myzt:rg", longopts, NULL)) != -1)
   {
     switch (c)
     {
@@ -893,7 +893,7 @@ int main(int argc, char *argv[])
   if (optind >= argc) {
     print_usage();
     return 0;
-  }
+  }*/
 
   m_filename = "/opt/vc/src/hello_pi/hello_video/test.h264";//argv[optind];
 
