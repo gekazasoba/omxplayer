@@ -93,7 +93,6 @@ bool              m_stop                = false;
 DllBcmHost        m_BcmHost;
 OMXPlayerVideo    m_player_video;
 OMXPlayerAudio    m_player_audio;
-int               m_tv_show_info        = 0;
 bool              m_has_video           = false;
 bool              m_has_audio           = false;
 bool              m_gen_log             = false;
@@ -310,7 +309,6 @@ int main(int argc, char *argv[])
   float m_fps            = 0.0f; // unset
   TV_DISPLAY_STATE_T   tv_state;
   double last_seek_pos = 0;
-  bool idle = false;
   std::string            m_cookie              = "";
   std::string            m_user_agent          = "";
   std::string            m_lavfdopts           = "";
@@ -462,12 +460,6 @@ int main(int argc, char *argv[])
       double oldPos, newPos;
     }
 
-    if (idle)
-    {
-      usleep(10000);
-      continue;
-    }
-
     /* player got in an error state */
     if(m_player_audio.Error())
     {
@@ -482,47 +474,10 @@ int main(int argc, char *argv[])
       double audio_pts = m_player_audio.GetCurrentPTS();
       double video_pts = m_player_video.GetCurrentPTS();
 
-      if (0 && m_av_clock->OMXIsPaused())
-      {
-        double old_stamp = stamp;
-        if (audio_pts != DVD_NOPTS_VALUE && (stamp == 0 || audio_pts < stamp))
-          stamp = audio_pts;
-        if (video_pts != DVD_NOPTS_VALUE && (stamp == 0 || video_pts < stamp))
-          stamp = video_pts;
-        if (old_stamp != stamp)
-        {
-          m_av_clock->OMXMediaTime(stamp);
-          stamp = m_av_clock->OMXMediaTime();
-        }
-      }
-
       float audio_fifo = audio_pts == DVD_NOPTS_VALUE ? 0.0f : audio_pts / DVD_TIME_BASE - stamp * 1e-6;
       float video_fifo = video_pts == DVD_NOPTS_VALUE ? 0.0f : video_pts / DVD_TIME_BASE - stamp * 1e-6;
       float threshold = std::min(0.1f, (float)m_player_audio.GetCacheTotal() * 0.1f);
       bool audio_fifo_low = false, video_fifo_low = false, audio_fifo_high = false, video_fifo_high = false;
-
-      if(m_tv_show_info)
-      {
-        static unsigned count;
-        if ((count++ & 7) == 0)
-        {
-          char response[80];
-          if (m_player_video.GetDecoderBufferSize() && m_player_audio.GetCacheTotal())
-            vc_gencmd(response, sizeof response, "render_bar 4 video_fifo %d %d %d %d",
-                      (int)(100.0*m_player_video.GetDecoderBufferSize()-m_player_video.GetDecoderFreeSpace())/m_player_video.GetDecoderBufferSize(),
-                      (int)(100.0*video_fifo/m_player_audio.GetCacheTotal()),
-                      0, 100);
-          if (m_player_audio.GetCacheTotal())
-            vc_gencmd(response, sizeof response, "render_bar 5 audio_fifo %d %d %d %d",
-                      (int)(100.0*audio_fifo/m_player_audio.GetCacheTotal()),
-                      (int)(100.0*m_player_audio.GetDelay()/m_player_audio.GetCacheTotal()),
-                      0, 100);
-          vc_gencmd(response, sizeof response, "render_bar 6 video_queue %d %d %d %d",
-                    m_player_video.GetLevel(), 0, 0, 100);
-          vc_gencmd(response, sizeof response, "render_bar 7 audio_queue %d %d %d %d",
-                    m_player_audio.GetLevel(), 0, 0, 100);
-        }
-      }
 
       if (audio_pts != DVD_NOPTS_VALUE)
       {
