@@ -112,10 +112,8 @@ bool OMXPlayerVideo::Open(OMXClock *av_clock, const OMXVideoConfig &config)
   if(!OpenDecoder())
   {
     Close();
-    return {
-            printf("omx player openning error 2");
-            return false;
-    };
+    printf("omx player openning error 2");
+    return false;
   }
 
   if(m_config.use_thread)
