@@ -188,7 +188,7 @@ class Player{
     }
 
 public:
-    Player(std::string fileName) m_filename(fileName) {
+    Player(std::string fileName) : m_filename(fileName) {
 
     }
 
