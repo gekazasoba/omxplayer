@@ -228,8 +228,7 @@ void cleanup() {
   g_RBP.Deinitialize();
 }
 
-int main(int argc, char *argv[])
-{
+void init() {
   signal(SIGSEGV, sig_handler);
   signal(SIGABRT, sig_handler);
   signal(SIGFPE, sig_handler);
@@ -323,6 +322,11 @@ int main(int argc, char *argv[])
 
   m_av_clock->OMXReset(m_has_video, m_has_audio);
   m_av_clock->OMXStateExecute();
+}
+
+int main(int argc, char *argv[])
+{
+  init();
 
   while(!m_stop)
   {
