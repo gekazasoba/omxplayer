@@ -100,7 +100,6 @@ int               m_tv_show_info        = 0;
 bool              m_has_video           = false;
 bool              m_has_audio           = false;
 bool              m_gen_log             = false;
-bool              m_loop                = false;
 
 enum{ERROR=-1,SUCCESS,ONEBYTE};
 
@@ -445,14 +444,10 @@ int main(int argc, char *argv[])
 
   bool                  m_send_eos            = false;
   bool                  m_packet_after_seek   = false;
-  bool                  m_seek_flush          = false;
-  bool                  m_chapter_seek        = false;
   std::string           m_filename;
   double                m_incr                = 0;
-  double                m_loop_from           = 0;
   CRBP                  g_RBP;
   COMXCore              g_OMX;
-  bool                  m_stats               = false;
   bool                  m_dump_format         = false;
   bool                  m_dump_format_exit    = false;
   FORMAT_3D_T           m_3d                  = CONF_FLAGS_FORMAT_NONE;
@@ -520,7 +515,6 @@ int main(int argc, char *argv[])
 
   m_has_video     = m_omx_reader.VideoStreamCount();
   m_has_audio     = m_audio_index_use < 0 ? false : m_omx_reader.AudioStreamCount();
-  m_loop          = m_loop && m_omx_reader.CanSeek();
 
   if (m_audio_extension)
   {
@@ -647,27 +641,24 @@ int main(int argc, char *argv[])
       continue;
     }
 
-    if(m_seek_flush || m_incr != 0)
+    if(m_incr != 0)
     {
       double seek_pos     = 0;
       double pts          = 0;
 
-      if (!m_chapter_seek)
+      pts = m_av_clock->OMXMediaTime();
+
+      seek_pos = (pts ? pts / DVD_TIME_BASE : last_seek_pos) + m_incr;
+      last_seek_pos = seek_pos;
+
+      seek_pos *= 1000.0;
+
+      if(m_omx_reader.SeekTime((int)seek_pos, m_incr < 0.0f, &startpts))
       {
-        pts = m_av_clock->OMXMediaTime();
-
-        seek_pos = (pts ? pts / DVD_TIME_BASE : last_seek_pos) + m_incr;
-        last_seek_pos = seek_pos;
-
-        seek_pos *= 1000.0;
-
-        if(m_omx_reader.SeekTime((int)seek_pos, m_incr < 0.0f, &startpts))
-        {
-          unsigned t = (unsigned)(startpts*1e-6);
-          auto dur = m_omx_reader.GetStreamLength() / 1000;
-          printf("Seek to: %02d:%02d:%02d\n", (t/3600), (t/60)%60, t%60);
-          FlushStreams(startpts);
-        }
+        unsigned t = (unsigned)(startpts*1e-6);
+        auto dur = m_omx_reader.GetStreamLength() / 1000;
+        printf("Seek to: %02d:%02d:%02d\n", (t/3600), (t/60)%60, t%60);
+        FlushStreams(startpts);
       }
 
       sentStarted = false;
@@ -684,7 +675,6 @@ int main(int argc, char *argv[])
       m_av_clock->OMXPause();
 
       m_packet_after_seek = false;
-      m_seek_flush = false;
       m_incr = 0;
     }
     else if(m_packet_after_seek && TRICKPLAY(m_av_clock->OMXPlaySpeed()))
@@ -740,16 +730,6 @@ int main(int argc, char *argv[])
       float video_fifo = video_pts == DVD_NOPTS_VALUE ? 0.0f : video_pts / DVD_TIME_BASE - stamp * 1e-6;
       float threshold = std::min(0.1f, (float)m_player_audio.GetCacheTotal() * 0.1f);
       bool audio_fifo_low = false, video_fifo_low = false, audio_fifo_high = false, video_fifo_high = false;
-
-      if(m_stats)
-      {
-        static int count;
-        if ((count++ & 7) == 0)
-          printf("M:%8.0f V:%6.2fs %6dk/%6dk A:%6.2f %6.02fs/%6.02fs Cv:%6dk Ca:%6dk                            \r", stamp,
-                 video_fifo, (m_player_video.GetDecoderBufferSize()-m_player_video.GetDecoderFreeSpace())>>10, m_player_video.GetDecoderBufferSize()>>10,
-                 audio_fifo, m_player_audio.GetDelay(), m_player_audio.GetCacheTotal(),
-                 m_player_video.GetCached()>>10, m_player_audio.GetCached()>>10);
-      }
 
       if(m_tv_show_info)
       {
@@ -871,13 +851,6 @@ int main(int argc, char *argv[])
         OMXClock::OMXSleep(10);
         continue;
       }
-
-      if (m_loop)
-      {
-        m_incr = m_loop_from - (m_av_clock->OMXMediaTime() ? m_av_clock->OMXMediaTime() / DVD_TIME_BASE : last_seek_pos);
-        continue;
-      }
-
       break;
     }
 
@@ -916,10 +889,7 @@ int main(int argc, char *argv[])
     }
   }
 
-    do_exit:
-  if (m_stats)
-    printf("\n");
-
+do_exit:
   if (m_stop)
   {
     unsigned t = (unsigned)(m_av_clock->OMXMediaTime()*1e-6);
