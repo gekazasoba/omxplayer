@@ -607,7 +607,7 @@ void INIT_CONFIG(int argc, char *argv[]){
     bool                  m_dump_format         = false;
     bool                  m_dump_format_exit    = false;
     FORMAT_3D_T           m_3d                  = CONF_FLAGS_FORMAT_NONE;
-    bool                                = false;
+    bool                  m_refresh              = false;
 
     int c;
     while ((c = getopt_long(argc, argv, "wiIhvkn:l:o:cslb::pd3:Myzt:rg", longopts, NULL)) != -1)
