@@ -704,7 +704,7 @@ void INIT_CONFIG(int argc, char *argv[]){
                    m_config_audio.device != "alsa")
                 {
                     printf("Bad argument for -%c: Output device must be `local', `hdmi', `both' or `alsa'\n", c);
-                    return EXIT_FAILURE;
+                    return;
                 }
                 m_config_audio.device = "omx:" + m_config_audio.device;
                 break;
@@ -846,7 +846,7 @@ void INIT_CONFIG(int argc, char *argv[]){
                 {
                     printf("Wrong layout specified: %s\n", optarg);
                     print_usage();
-                    return EXIT_FAILURE;
+                    return;
                 }
                 break;
             }
@@ -889,21 +889,21 @@ void INIT_CONFIG(int argc, char *argv[]){
                 break;
             case 'h':
                 print_usage();
-                return EXIT_SUCCESS;
+                return;
                 break;
             case 'v':
                 print_version();
-                return EXIT_SUCCESS;
+                return;
                 break;
             case 'k':
                 print_keybindings();
-                return EXIT_SUCCESS;
+                return;
                 break;
             case ':':
-                return EXIT_FAILURE;
+                return;
                 break;
             default:
-                return EXIT_FAILURE;
+                return;
                 break;
         }
     }
