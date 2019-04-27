@@ -97,17 +97,6 @@ void sig_handler(int s)
   abort();
 }
 
-static void SetSpeed(int iSpeed)
-{
-  if(!m_av_clock)
-    return;
-
-  m_omx_reader.SetSpeed(iSpeed);
-
-  m_av_clock->OMXSetSpeed(iSpeed);
-  m_av_clock->OMXSetSpeed(iSpeed, true, true);
-}
-
 static float get_display_aspect_ratio(HDMI_ASPECT_T aspect)
 {
   float display_aspect;
@@ -226,7 +215,6 @@ int main(int argc, char *argv[])
   float m_timeout        = 10.0f; // amount of time file/network operation can stall for before timing out
   int m_orientation      = -1; // unset
   float m_fps            = 0.0f; // unset
-  TV_DISPLAY_STATE_T   tv_state;
 
 
   double m_last_check_time = 0.0;
