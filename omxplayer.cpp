@@ -494,6 +494,7 @@ static void blank_background(uint32_t rgba)
   assert( ret == 0 );
 }
 
+#define S(x) (int)(DVD_PLAYSPEED_NORMAL*(x))
 const int playspeeds[] = {
           S(0), S(1/16.0), S(1/8.0), S(1/4.0), S(1/2.0), S(0.975)
           , S(1.0), S(1.125), S(-32.0), S(-16.0), S(-8.0), S(-4)
@@ -543,7 +544,7 @@ int main(int argc, char *argv[])
   std::string            m_lavfdopts           = "";
   std::string            m_avdict              = "";
 
-#define S(x) (int)(DVD_PLAYSPEED_NORMAL*(x))
+
 
 
   int playspeed_current = playspeed_normal;
