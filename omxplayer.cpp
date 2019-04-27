@@ -93,13 +93,11 @@ bool              m_Pause               = false;
 OMXReader         m_omx_reader;
 int               m_audio_index_use     = 0;
 OMXClock          *m_av_clock           = NULL;
-OMXControl        m_omxcontrol;
 OMXAudioConfig    m_config_audio;
 OMXVideoConfig    m_config_video;
 OMXPacket         *m_omx_pkt            = NULL;
 bool              m_no_hdmi_clock_sync  = false;
 bool              m_stop                = false;
-int               m_subtitle_index      = -1;
 DllBcmHost        m_BcmHost;
 OMXPlayerVideo    m_player_video;
 OMXPlayerAudio    m_player_audio;
@@ -518,15 +516,7 @@ int main(int argc, char *argv[])
     printf("Only %dM of gpu_mem is configured. Try running \"sudo raspi-config\" and ensure that \"memory_split\" has a value of %d or greater\n", gpu_mem, min_gpu_mem);
 
   m_av_clock = new OMXClock();
-  int control_err = m_omxcontrol.init(
-          m_av_clock,
-          &m_player_audio,
-          &m_player_subtitles,
-          &m_omx_reader,
-          m_dbus_name
-  );
-
-    change_file:
+  change_file:
 
   if(!m_omx_reader.Open(m_filename.c_str(), m_dump_format, m_config_audio.is_live, m_timeout, m_cookie.c_str(), m_user_agent.c_str(), m_lavfdopts.c_str(), m_avdict.c_str()))
     goto do_exit;
@@ -653,9 +643,7 @@ int main(int argc, char *argv[])
     }
 
     if (update) {
-      OMXControlResult result = control_err
-                                ? (OMXControlResult)( KeyConfig::ACTION_BLANK)
-                                : m_omxcontrol.getEvent();
+      OMXControlResult result = KeyConfig::ACTION_BLANK;
       double oldPos, newPos;
 
       switch(result.getKey())
