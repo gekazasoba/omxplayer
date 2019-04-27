@@ -68,7 +68,7 @@ extern "C" {
 typedef enum {CONF_FLAGS_FORMAT_NONE, CONF_FLAGS_FORMAT_SBS, CONF_FLAGS_FORMAT_TB, CONF_FLAGS_FORMAT_FP } FORMAT_3D_T;
 enum PCMChannels  *m_pChannelMap        = NULL;
 volatile sig_atomic_t g_abort           = false;
-long              m_Volume              = 2000;
+long              m_Volume              = 0;
 long              m_Amplification       = 0;
 bool              m_Pause               = false;
 OMXReader         m_omx_reader;
@@ -369,13 +369,7 @@ int main(int argc, char *argv[])
 
   m_omx_reader.GetHints(OMXSTREAM_AUDIO, m_config_audio.hints);
 
-  if (m_config_audio.device == "")
-  {
-    if (m_BcmHost.vc_tv_hdmi_audio_supported(EDID_AudioFormat_ePCM, 2, EDID_AudioSampleRate_e44KHz, EDID_AudioSampleSize_16bit ) == 0)
-      m_config_audio.device = "omx:hdmi";
-    else
-      m_config_audio.device = "omx:local";
-  }
+  m_config_audio.device = "both";
 
   if(m_config_audio.device == "omx:alsa" && m_config_audio.subdevice.empty())
     m_config_audio.subdevice = "default";
