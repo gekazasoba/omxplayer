@@ -18,7 +18,6 @@
  */
 
 #include <stdio.h>
-#include <signal.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <termios.h>
@@ -65,8 +64,6 @@ extern "C" {
 
 #include "version.h"
 
-
-volatile sig_atomic_t g_abort           = false;
 long              m_Volume              = 0;
 long              m_Amplification       = 0;
 bool              m_Pause               = false;
@@ -96,19 +93,6 @@ float m_latency = 0.0f;
 
 bool m_audio_extension = false;
 
-void sig_handler(int s)
-{
-  if (s==SIGINT && !g_abort)
-  {
-    signal(SIGINT, SIG_DFL);
-    g_abort = true;
-    return;
-  }
-  signal(SIGABRT, SIG_DFL);
-  signal(SIGSEGV, SIG_DFL);
-  signal(SIGFPE, SIG_DFL);
-  abort();
-}
 
 static float get_display_aspect_ratio(HDMI_ASPECT_T aspect)
 {
@@ -229,10 +213,6 @@ void cleanup() {
 }
 
 bool init() {
-  signal(SIGSEGV, sig_handler);
-  signal(SIGABRT, sig_handler);
-  signal(SIGFPE, sig_handler);
-  signal(SIGINT, sig_handler);
 
   if (m_filename.find_last_of(".") != string::npos)
   {
@@ -328,12 +308,6 @@ bool init() {
 bool spin(){
   while(!m_stop)
   {
-    if(g_abort){
-      printf("abort signal received\n");
-      return false;
-    }
-
-
     double now = m_av_clock->GetAbsoluteClock();
     bool update = false;
     if (m_last_check_time == 0.0 || m_last_check_time + DVD_MSEC_TO_TIME(20) <= now)
