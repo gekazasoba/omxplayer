@@ -493,14 +493,119 @@ static void blank_background(uint32_t rgba)
   assert( ret == 0 );
 }
 
-void INIT_CONFIG(){
+struct option longopts[] = {
+        { "info",         no_argument,        NULL,          'i' },
+        { "with-info",    no_argument,        NULL,          'I' },
+        { "help",         no_argument,        NULL,          'h' },
+        { "version",      no_argument,        NULL,          'v' },
+        { "keys",         no_argument,        NULL,          'k' },
+        { "aidx",         required_argument,  NULL,          'n' },
+        { "adev",         required_argument,  NULL,          'o' },
+        { "stats",        no_argument,        NULL,          's' },
+        { "passthrough",  no_argument,        NULL,          'p' },
+        { "vol",          required_argument,  NULL,          vol_opt },
+        { "amp",          required_argument,  NULL,          amp_opt },
+        { "deinterlace",  no_argument,        NULL,          'd' },
+        { "nodeinterlace",no_argument,        NULL,          no_deinterlace_opt },
+        { "nativedeinterlace",no_argument,    NULL,          native_deinterlace_opt },
+        { "anaglyph",     required_argument,  NULL,          anaglyph_opt },
+        { "advanced",     optional_argument,  NULL,          advanced_opt },
+        { "hw",           no_argument,        NULL,          'w' },
+        { "3d",           required_argument,  NULL,          '3' },
+        { "allow-mvc",    no_argument,        NULL,          'M' },
+        { "hdmiclocksync", no_argument,       NULL,          'y' },
+        { "nohdmiclocksync", no_argument,     NULL,          'z' },
+        { "refresh",      no_argument,        NULL,          'r' },
+        { "genlog",       no_argument,        NULL,          'g' },
+        { "sid",          required_argument,  NULL,          't' },
+        { "pos",          required_argument,  NULL,          'l' },
+        { "blank",        optional_argument,  NULL,          'b' },
+        { "font",         required_argument,  NULL,          font_opt },
+        { "italic-font",  required_argument,  NULL,          italic_font_opt },
+        { "font-size",    required_argument,  NULL,          font_size_opt },
+        { "align",        required_argument,  NULL,          align_opt },
+        { "no-ghost-box", no_argument,        NULL,          no_ghost_box_opt },
+        { "subtitles",    required_argument,  NULL,          subtitles_opt },
+        { "lines",        required_argument,  NULL,          lines_opt },
+        { "win",          required_argument,  NULL,          pos_opt },
+        { "crop",         required_argument,  NULL,          crop_opt },
+        { "aspect-mode",  required_argument,  NULL,          aspect_mode_opt },
+        { "audio_fifo",   required_argument,  NULL,          audio_fifo_opt },
+        { "video_fifo",   required_argument,  NULL,          video_fifo_opt },
+        { "audio_queue",  required_argument,  NULL,          audio_queue_opt },
+        { "video_queue",  required_argument,  NULL,          video_queue_opt },
+        { "threshold",    required_argument,  NULL,          threshold_opt },
+        { "timeout",      required_argument,  NULL,          timeout_opt },
+        { "boost-on-downmix", no_argument,    NULL,          boost_on_downmix_opt },
+        { "no-boost-on-downmix", no_argument, NULL,          no_boost_on_downmix_opt },
+        { "key-config",   required_argument,  NULL,          key_config_opt },
+        { "no-osd",       no_argument,        NULL,          no_osd_opt },
+        { "no-keys",      no_argument,        NULL,          no_keys_opt },
+        { "orientation",  required_argument,  NULL,          orientation_opt },
+        { "fps",          required_argument,  NULL,          fps_opt },
+        { "live",         no_argument,        NULL,          live_opt },
+        { "layout",       required_argument,  NULL,          layout_opt },
+        { "dbus_name",    required_argument,  NULL,          dbus_name_opt },
+        { "loop",         no_argument,        NULL,          loop_opt },
+        { "layer",        required_argument,  NULL,          layer_opt },
+        { "alpha",        required_argument,  NULL,          alpha_opt },
+        { "display",      required_argument,  NULL,          display_opt },
+        { "cookie",       required_argument,  NULL,          http_cookie_opt },
+        { "user-agent",   required_argument,  NULL,          http_user_agent_opt },
+        { "lavfdopts",    required_argument,  NULL,          lavfdopts_opt },
+        { "avdict",       required_argument,  NULL,          avdict_opt },
+        { 0, 0, 0, 0 }
+};
+
+const int font_opt        = 0x100;
+const int italic_font_opt = 0x201;
+const int font_size_opt   = 0x101;
+const int align_opt       = 0x102;
+const int no_ghost_box_opt = 0x203;
+const int subtitles_opt   = 0x103;
+const int lines_opt       = 0x104;
+const int pos_opt         = 0x105;
+const int vol_opt         = 0x106;
+const int audio_fifo_opt  = 0x107;
+const int video_fifo_opt  = 0x108;
+const int audio_queue_opt = 0x109;
+const int video_queue_opt = 0x10a;
+const int no_deinterlace_opt = 0x10b;
+const int threshold_opt   = 0x10c;
+const int timeout_opt     = 0x10f;
+const int boost_on_downmix_opt = 0x200;
+const int no_boost_on_downmix_opt = 0x207;
+const int key_config_opt  = 0x10d;
+const int amp_opt         = 0x10e;
+const int no_osd_opt      = 0x202;
+const int orientation_opt = 0x204;
+const int fps_opt         = 0x208;
+const int live_opt        = 0x205;
+const int layout_opt      = 0x206;
+const int dbus_name_opt   = 0x209;
+const int loop_opt        = 0x20a;
+const int layer_opt       = 0x20b;
+const int no_keys_opt     = 0x20c;
+const int anaglyph_opt    = 0x20d;
+const int native_deinterlace_opt = 0x20e;
+const int display_opt     = 0x20f;
+const int alpha_opt       = 0x210;
+const int advanced_opt    = 0x211;
+const int aspect_mode_opt = 0x212;
+const int crop_opt        = 0x213;
+const int http_cookie_opt = 0x300;
+const int http_user_agent_opt = 0x301;
+const int lavfdopts_opt   = 0x400;
+const int avdict_opt      = 0x401;
+
+void INIT_CONFIG(int argc, char *argv[]){
     double                m_incr                = 0;
     double                m_loop_from           = 0;
     bool                  m_stats               = false;
     bool                  m_dump_format         = false;
     bool                  m_dump_format_exit    = false;
     FORMAT_3D_T           m_3d                  = CONF_FLAGS_FORMAT_NONE;
-    bool                  m_refresh             = false;
+    bool                                = false;
 
     int c;
     while ((c = getopt_long(argc, argv, "wiIhvkn:l:o:cslb::pd3:Myzt:rg", longopts, NULL)) != -1)
@@ -788,7 +893,7 @@ void INIT_CONFIG(){
 
 int main(int argc, char *argv[]){
   printf("agugu\n");
-  INIT_CONFIG();
+  INIT_CONFIG(argc, argv);
   printf("config initialized\n");
   CRBP                  g_RBP;
   COMXCore              g_OMX;
