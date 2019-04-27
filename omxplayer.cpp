@@ -65,14 +65,11 @@ extern "C" {
 #include "version.h"
 
 
-typedef enum {CONF_FLAGS_FORMAT_NONE, CONF_FLAGS_FORMAT_SBS, CONF_FLAGS_FORMAT_TB, CONF_FLAGS_FORMAT_FP } FORMAT_3D_T;
-enum PCMChannels  *m_pChannelMap        = NULL;
 volatile sig_atomic_t g_abort           = false;
 long              m_Volume              = 0;
 long              m_Amplification       = 0;
 bool              m_Pause               = false;
 OMXReader         m_omx_reader;
-int               m_audio_index_use     = 0;
 OMXClock          *m_av_clock           = NULL;
 OMXAudioConfig    m_config_audio;
 OMXVideoConfig    m_config_video;
@@ -83,7 +80,6 @@ OMXPlayerVideo    m_player_video;
 OMXPlayerAudio    m_player_audio;
 bool              m_has_video           = false;
 bool              m_has_audio           = false;
-bool              m_gen_log             = false;
 
 enum{ERROR=-1,SUCCESS,ONEBYTE};
 
@@ -186,21 +182,9 @@ void SetVideoMode(int width, int height, int fpsrate, int fpsscale, FORMAT_3D_T 
   {
     num_modes = m_BcmHost.vc_tv_hdmi_get_supported_modes_new(group,
                                                              supported_modes, max_supported_modes, &prefer_group, &prefer_mode);
-
-    if(m_gen_log) {
-      CLog::Log(LOGDEBUG, "EGL get supported modes (%d) = %d, prefer_group=%x, prefer_mode=%x\n",
-                group, num_modes, prefer_group, prefer_mode);
-    }
   }
   if (supported_modes)
     delete[] supported_modes;
-}
-
-bool Exists(const std::string& path)
-{
-  struct stat buf;
-  auto error = stat(path.c_str(), &buf);
-  return !error || errno != ENOENT;
 }
 
 static int get_mem_gpu(void)
@@ -292,12 +276,7 @@ int main(int argc, char *argv[])
     if (!extension.IsEmpty() && m_musicExtensions.Find(extension.ToLower()) != -1)
       m_audio_extension = true;
   }
-  if(m_gen_log) {
-    CLog::SetLogLevel(LOG_LEVEL_DEBUG);
-    CLog::Init("./");
-  } else {
-    CLog::SetLogLevel(LOG_LEVEL_NONE);
-  }
+  CLog::SetLogLevel(LOG_LEVEL_NONE);
 
   g_RBP.Initialize();
   g_OMX.Initialize();
@@ -314,7 +293,7 @@ int main(int argc, char *argv[])
     goto do_exit;
 
   m_has_video     = m_omx_reader.VideoStreamCount();
-  m_has_audio     = m_audio_index_use < 0 ? false : m_omx_reader.AudioStreamCount();
+  m_has_audio     = m_omx_reader.AudioStreamCount();
 
   if (m_audio_extension)
   {
@@ -339,9 +318,6 @@ int main(int argc, char *argv[])
 
   if (m_fps > 0.0f)
     m_config_video.hints.fpsrate = m_fps * DVD_TIME_BASE, m_config_video.hints.fpsscale = DVD_TIME_BASE;
-
-  if(m_audio_index_use > 0)
-    m_omx_reader.SetActiveStream(OMXSTREAM_AUDIO, m_audio_index_use-1);
 
   // get display aspect
   TV_DISPLAY_STATE_T current_tv_state;

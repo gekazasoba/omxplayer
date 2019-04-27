@@ -1,6 +1,10 @@
 //
 // Created by geka on 27.04.19.
 //
+
+#ifndef OMXPLAYER_CONSTS_HH
+#define OMXPLAYER_CONSTS_HH
+
 #include "OMXClock.h"
 
 std::string       m_font_path           = "/usr/share/fonts/truetype/freefont/FreeSans.ttf";
@@ -21,3 +25,4 @@ const int playspeeds[] = {
         , S(1.0), S(1.125), S(-32.0), S(-16.0), S(-8.0), S(-4)
         , S(-2), S(-1), S(1), S(2.0), S(4.0), S(8.0), S(16.0), S(32.0)};
 
+#endif //OMXPLAYER_CONSTS_HH
