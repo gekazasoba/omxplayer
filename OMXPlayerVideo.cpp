@@ -90,7 +90,7 @@ void OMXPlayerVideo::UnLockDecoder()
 bool OMXPlayerVideo::Open(OMXClock *av_clock, const OMXVideoConfig &config)
 {
   if (!m_dllAvUtil.Load() || !m_dllAvCodec.Load() || !m_dllAvFormat.Load() || !av_clock)  {
-    printf("omx player openning error 1");
+    printf("omx player openning error 1\n");
     return false;
   }
 
@@ -112,7 +112,7 @@ bool OMXPlayerVideo::Open(OMXClock *av_clock, const OMXVideoConfig &config)
   if(!OpenDecoder())
   {
     Close();
-    printf("omx player openning error 2");
+    printf("omx player openning error 2\n");
     return false;
   }
 
