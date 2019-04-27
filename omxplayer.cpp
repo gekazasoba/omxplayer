@@ -82,6 +82,23 @@ OMXPlayerAudio    m_player_audio;
 bool              m_has_video           = false;
 bool              m_has_audio           = false;
 
+bool                  m_send_eos            = false;
+std::string           m_filename;
+CRBP                  g_RBP;
+COMXCore              g_OMX;
+uint32_t              m_blank_background    = 0;
+float m_threshold      = -1.0f; // amount of audio/video required to come out of buffering
+float m_timeout        = 10.0f; // amount of time file/network operation can stall for before timing out
+
+
+double m_last_check_time = 0.0;
+float m_latency = 0.0f;
+
+//m_filename = "/opt/vc/src/hello_pi/hello_video/test.h264";//argv[optind];
+m_filename = "/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4";
+
+bool m_audio_extension = false;
+
 void sig_handler(int s)
 {
   if (s==SIGINT && !g_abort)
@@ -188,7 +205,9 @@ static void blank_background(uint32_t rgba)
   assert( ret == 0 );
 }
 
+void cleanup(){
 
+}
 
 int main(int argc, char *argv[])
 {
@@ -196,23 +215,6 @@ int main(int argc, char *argv[])
   signal(SIGABRT, sig_handler);
   signal(SIGFPE, sig_handler);
   signal(SIGINT, sig_handler);
-
-  bool                  m_send_eos            = false;
-  std::string           m_filename;
-  CRBP                  g_RBP;
-  COMXCore              g_OMX;
-  uint32_t              m_blank_background    = 0;
-  float m_threshold      = -1.0f; // amount of audio/video required to come out of buffering
-  float m_timeout        = 10.0f; // amount of time file/network operation can stall for before timing out
-
-
-  double m_last_check_time = 0.0;
-  float m_latency = 0.0f;
-
-  //m_filename = "/opt/vc/src/hello_pi/hello_video/test.h264";//argv[optind];
-  m_filename = "/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4";
-
-  bool m_audio_extension = false;
 
   if (m_filename.find_last_of(".") != string::npos)
   {
@@ -460,12 +462,6 @@ int main(int argc, char *argv[])
   }
 
 do_exit:
-  if (m_stop)
-  {
-    unsigned t = (unsigned)(m_av_clock->OMXMediaTime()*1e-6);
-    printf("Stopped at: %02d:%02d:%02d\n", (t/3600), (t/60)%60, t%60);
-  }
-
   m_av_clock->OMXStop();
   m_av_clock->OMXStateIdle();
 
@@ -495,9 +491,7 @@ do_exit:
   // exit status success on playback end
   if (m_send_eos)
     return EXIT_SUCCESS;
-  // exit status OMXPlayer defined value on user quit
-  if (m_stop)
-    return 3;
+
   // exit status failure on other cases
   return EXIT_FAILURE;
 }
