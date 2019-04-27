@@ -58,7 +58,6 @@ extern "C" {
 #include "Srt.h"
 #include "KeyConfig.h"
 #include "utils/Strprintf.h"
-#include "Keyboard.h"
 
 #include <string>
 #include <utility>
@@ -81,7 +80,6 @@ long              m_Amplification       = 0;
 bool              m_NativeDeinterlace   = false;
 bool              m_HWDecode            = false;
 bool              m_osd                 = true;
-bool              m_no_keys             = false;
 std::string       m_external_subtitles_path;
 bool              m_has_external_subtitles = false;
 std::string       m_font_path           = "/usr/share/fonts/truetype/freefont/FreeSans.ttf";
@@ -98,7 +96,6 @@ OMXReader         m_omx_reader;
 int               m_audio_index_use     = 0;
 OMXClock          *m_av_clock           = NULL;
 OMXControl        m_omxcontrol;
-Keyboard          *m_keyboard           = NULL;
 OMXAudioConfig    m_config_audio;
 OMXVideoConfig    m_config_video;
 OMXPacket         *m_omx_pkt            = NULL;
@@ -129,25 +126,7 @@ void sig_handler(int s)
   signal(SIGABRT, SIG_DFL);
   signal(SIGSEGV, SIG_DFL);
   signal(SIGFPE, SIG_DFL);
-  if (NULL != m_keyboard)
-  {
-    m_keyboard->Close();
-  }
   abort();
-}
-
-void print_usage()
-{
-  printf(
-#include "help.h"
-  );
-}
-
-void print_keybindings()
-{
-  printf(
-#include "keys.h"
-  );
 }
 
 void print_version()
@@ -545,18 +524,11 @@ int main(int argc, char *argv[])
   std::string            m_avdict              = "";
 
 
-
-
   int playspeed_current = playspeed_normal;
   double m_last_check_time = 0.0;
   float m_latency = 0.0f;
   int c;
   std::string mode;
-
-  //Build default keymap just in case the --key-config option isn't used
-  map<int,int> keymap = KeyConfig::buildDefaultKeymap();
-
-
 
   m_filename = "/opt/vc/src/hello_pi/hello_video/test.h264";//argv[optind];
 
@@ -639,15 +611,6 @@ int main(int argc, char *argv[])
           &m_omx_reader,
           m_dbus_name
   );
-  if (false == m_no_keys)
-  {
-    m_keyboard = new Keyboard();
-  }
-  if (NULL != m_keyboard)
-  {
-    m_keyboard->setKeymap(keymap);
-    m_keyboard->setDbusName(m_dbus_name);
-  }
 
     change_file:
 
@@ -821,7 +784,7 @@ int main(int argc, char *argv[])
 
     if (update) {
       OMXControlResult result = control_err
-                                ? (OMXControlResult)(m_keyboard ? m_keyboard->getEvent() : KeyConfig::ACTION_BLANK)
+                                ? (OMXControlResult)( KeyConfig::ACTION_BLANK)
                                 : m_omxcontrol.getEvent();
       double oldPos, newPos;
 
@@ -1478,10 +1441,7 @@ int main(int argc, char *argv[])
   m_player_subtitles.Close();
   m_player_video.Close();
   m_player_audio.Close();
-  if (NULL != m_keyboard)
-  {
-    m_keyboard->Close();
-  }
+
 
   if(m_omx_pkt)
   {
