@@ -933,7 +933,7 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-  m_filename = argv[optind];
+  m_filename = "/opt/vc/src/hello_pi/hello_video/test.h264";//argv[optind];
 
   auto PrintFileNotFound = [](const std::string& path)
   {
