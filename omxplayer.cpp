@@ -474,14 +474,32 @@ public:
 
 int main(int argc, char *argv[])
 {
-  Player player("/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4");
-  if (!player.init())
-    return EXIT_FAILURE;
+  Player player1("/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4");
+  Player player2("/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4");
 
-  bool ok = player.spin();
-  player.cleanup();
+  if (!player1.init()){
+    printf("player 1 init failed\n");
+    return EXIT_FAILURE;
+  }
+
+  if (!player2.init()){
+    printf("player 2 init failed\n");
+    return EXIT_FAILURE;
+  }
+
+  printf("player 1 playing\n");
+
+  bool ok1 = player1.spin();
+
+  player1.cleanup();
+
+  printf("player 2 playing\n");
+
+  bool ok2 = player2.spin();
+
+  player2.cleanup();
 
   printf("have a nice day ;)\n");
 
-  return ok ? EXIT_SUCCESS : EXIT_FAILURE;
+  return ok1 && ok2 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
