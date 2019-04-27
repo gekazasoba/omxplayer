@@ -368,17 +368,7 @@ int main(int argc, char *argv[])
 
 
   m_omx_reader.GetHints(OMXSTREAM_AUDIO, m_config_audio.hints);
-
-  if (m_config_audio.device == "")
-  {
-    if (m_BcmHost.vc_tv_hdmi_audio_supported(EDID_AudioFormat_ePCM, 2, EDID_AudioSampleRate_e44KHz, EDID_AudioSampleSize_16bit ) == 0)
-      m_config_audio.device = "omx:hdmi";
-    else
-      m_config_audio.device = "omx:local";
-  }
-
-  if(m_config_audio.device == "omx:alsa" && m_config_audio.subdevice.empty())
-    m_config_audio.subdevice = "default";
+  m_config_audio.device = "omx:both";
 
   if ((m_config_audio.hints.codec == AV_CODEC_ID_AC3 || m_config_audio.hints.codec == AV_CODEC_ID_EAC3) &&
       m_BcmHost.vc_tv_hdmi_audio_supported(EDID_AudioFormat_eAC3, 2, EDID_AudioSampleRate_e44KHz, EDID_AudioSampleSize_16bit ) != 0)
