@@ -475,7 +475,7 @@ public:
 int main(int argc, char *argv[])
 {
   Player player1("/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4");
-  Player player2("/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4");
+  Player player2("/opt/vc/src/hello_pi/hello_video/test.h264");
 
   if (!player1.init()){
     printf("player 1 init failed\n");
