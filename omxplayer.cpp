@@ -609,7 +609,23 @@ void INIT_CONFIG(int argc, char *argv[]){
     FORMAT_3D_T           m_3d                  = CONF_FLAGS_FORMAT_NONE;
     bool                  m_refresh              = false;
 
+    double                startpts              = 0;
+    uint32_t              m_blank_background    = 0;
+    bool sentStarted = false;
+    float m_threshold      = -1.0f; // amount of audio/video required to come out of buffering
+    float m_timeout        = 10.0f; // amount of time file/network operation can stall for before timing out
+    int m_orientation      = -1; // unset
+    float m_fps            = 0.0f; // unset
+    TV_DISPLAY_STATE_T   tv_state;
+    double last_seek_pos = 0;
+    bool idle = false;
+    std::string            m_cookie              = "";
+    std::string            m_user_agent          = "";
+    std::string            m_lavfdopts           = "";
+    std::string            m_avdict              = "";
+
     int c;
+    std::string mode;
     while ((c = getopt_long(argc, argv, "wiIhvkn:l:o:cslb::pd3:Myzt:rg", longopts, NULL)) != -1)
     {
         switch (c)
