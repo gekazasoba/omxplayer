@@ -1,6 +1,7 @@
 //
 // Created by geka on 27.04.19.
 //
+#include "OMXClock.h"
 
 std::string       m_font_path           = "/usr/share/fonts/truetype/freefont/FreeSans.ttf";
 std::string       m_italic_font_path    = "/usr/share/fonts/truetype/freefont/FreeSansOblique.ttf";
