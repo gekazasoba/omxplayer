@@ -202,8 +202,30 @@ static void blank_background(uint32_t rgba)
   assert( ret == 0 );
 }
 
-void cleanup(){
+void cleanup() {
+  m_av_clock->OMXStop();
+  m_av_clock->OMXStateIdle();
 
+  m_player_video.Close();
+  m_player_audio.Close();
+
+
+  if(m_omx_pkt)
+  {
+    m_omx_reader.FreePacket(m_omx_pkt);
+    m_omx_pkt = NULL;
+  }
+
+  m_omx_reader.Close();
+
+  m_av_clock->OMXDeinitialize();
+  if (m_av_clock)
+    delete m_av_clock;
+
+  vc_tv_show_info(0);
+
+  g_OMX.Deinitialize();
+  g_RBP.Deinitialize();
 }
 
 int main(int argc, char *argv[])
@@ -459,29 +481,7 @@ int main(int argc, char *argv[])
   }
 
 do_exit:
-  m_av_clock->OMXStop();
-  m_av_clock->OMXStateIdle();
-
-  m_player_video.Close();
-  m_player_audio.Close();
-
-
-  if(m_omx_pkt)
-  {
-    m_omx_reader.FreePacket(m_omx_pkt);
-    m_omx_pkt = NULL;
-  }
-
-  m_omx_reader.Close();
-
-  m_av_clock->OMXDeinitialize();
-  if (m_av_clock)
-    delete m_av_clock;
-
-  vc_tv_show_info(0);
-
-  g_OMX.Deinitialize();
-  g_RBP.Deinitialize();
+  cleanup();
 
   printf("have a nice day ;)\n");
 
