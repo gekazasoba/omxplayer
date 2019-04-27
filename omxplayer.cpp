@@ -254,7 +254,7 @@ void init() {
 
   m_av_clock = new OMXClock();
   if(!m_omx_reader.Open(m_filename.c_str(), false, m_config_audio.is_live, m_timeout))
-    goto do_exit;
+    return false;
 
   m_has_video     = m_omx_reader.VideoStreamCount();
   m_has_audio     = m_omx_reader.AudioStreamCount();
@@ -268,10 +268,10 @@ void init() {
   // you really don't want want to match refresh rate without hdmi clock sync
 
   if(!m_av_clock->OMXInitialize())
-    goto do_exit;
+    return false;
 
   if(m_config_video.hdmi_clock_sync && !m_av_clock->HDMIClockSync())
-    goto do_exit;
+    return false;
 
   m_av_clock->OMXStateIdle();
   m_av_clock->OMXStop();
@@ -294,7 +294,7 @@ void init() {
   m_config_video.display_aspect *= (float)current_tv_state.display.hdmi.height/(float)current_tv_state.display.hdmi.width;
 
   if(m_has_video && !m_player_video.Open(m_av_clock, m_config_video))
-    goto do_exit;
+    return false;
 
 
   m_omx_reader.GetHints(OMXSTREAM_AUDIO, m_config_audio.hints);
@@ -308,7 +308,7 @@ void init() {
     m_config_audio.passthrough = false;
 
   if(m_has_audio && !m_player_audio.Open(m_av_clock, m_config_audio, &m_omx_reader))
-    goto do_exit;
+    return false;
 
   if(m_has_audio)
   {
@@ -324,14 +324,14 @@ void init() {
   m_av_clock->OMXStateExecute();
 }
 
-int main(int argc, char *argv[])
-{
-  init();
-
+bool spin(){
   while(!m_stop)
   {
-    if(g_abort)
-      goto do_exit;
+    if(g_abort){
+      printf("abort signal received\n");
+      return false;
+    }
+
 
     double now = m_av_clock->GetAbsoluteClock();
     bool update = false;
@@ -345,7 +345,7 @@ int main(int argc, char *argv[])
     if(m_player_audio.Error())
     {
       printf("audio player error. emergency exit!!!\n");
-      goto do_exit;
+      return false;
     }
 
     if (update)
@@ -484,13 +484,20 @@ int main(int argc, char *argv[])
     }
   }
 
-do_exit:
+  return true;
+}
+
+int main(int argc, char *argv[])
+{
+  init();
+
+  bool ok = spin();
   cleanup();
 
   printf("have a nice day ;)\n");
 
   // exit status success on playback end
-  if (m_send_eos)
+  if (ok)
     return EXIT_SUCCESS;
 
   // exit status failure on other cases
