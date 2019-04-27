@@ -940,6 +940,10 @@ int main(int argc, char *argv[]){
   m_av_clock->OMXStateIdle();
   m_av_clock->OMXStop();
   m_av_clock->OMXPause();
+
+  m_omx_reader.GetHints(OMXSTREAM_AUDIO, m_config_audio.hints);
+  m_omx_reader.GetHints(OMXSTREAM_VIDEO, m_config_video.hints);
+
   if(!m_omx_reader.Open("/opt/vc/src/hello_pi/hello_video/test.h264", false))
   {
     printf("can't open file\n");
