@@ -68,7 +68,7 @@ extern "C" {
 typedef enum {CONF_FLAGS_FORMAT_NONE, CONF_FLAGS_FORMAT_SBS, CONF_FLAGS_FORMAT_TB, CONF_FLAGS_FORMAT_FP } FORMAT_3D_T;
 enum PCMChannels  *m_pChannelMap        = NULL;
 volatile sig_atomic_t g_abort           = false;
-long              m_Volume              = 0;
+long              m_Volume              = 2000;
 long              m_Amplification       = 0;
 bool              m_Pause               = false;
 OMXReader         m_omx_reader;
