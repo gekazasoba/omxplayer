@@ -83,7 +83,7 @@ bool              m_has_video           = false;
 bool              m_has_audio           = false;
 
 bool                  m_send_eos            = false;
-std::string           m_filename;
+std::string           m_filename = "/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4";
 CRBP                  g_RBP;
 COMXCore              g_OMX;
 uint32_t              m_blank_background    = 0;
@@ -93,9 +93,6 @@ float m_timeout        = 10.0f; // amount of time file/network operation can sta
 
 double m_last_check_time = 0.0;
 float m_latency = 0.0f;
-
-//m_filename = "/opt/vc/src/hello_pi/hello_video/test.h264";//argv[optind];
-m_filename = "/home/pi/PromoutionCj/ClipStorage/2f2a4194-6a32-4d48-a1cf-95df82d47a83.mp4";
 
 bool m_audio_extension = false;
 
