@@ -623,6 +623,7 @@ void INIT_CONFIG(int argc, char *argv[]){
     std::string            m_user_agent          = "";
     std::string            m_lavfdopts           = "";
     std::string            m_avdict              = "";
+    map<int,int> keymap = KeyConfig::buildDefaultKeymap();
 
     int c;
     std::string mode;
@@ -647,7 +648,7 @@ void INIT_CONFIG(int argc, char *argv[]){
                 if(mode != "SBS" && mode != "TB" && mode != "FP")
                 {
                     print_usage();
-                    return 0;
+                    return;
                 }
                 if(mode == "TB")
                     m_3d = CONF_FLAGS_FORMAT_TB;
