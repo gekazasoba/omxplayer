@@ -95,7 +95,7 @@ class Player{
     bool m_audio_extension = false;
 
 
-    static float get_display_aspect_ratio(HDMI_ASPECT_T aspect)
+    float get_display_aspect_ratio(HDMI_ASPECT_T aspect)
     {
       float display_aspect;
       switch (aspect) {
@@ -111,7 +111,7 @@ class Player{
       return display_aspect;
     }
 
-    static float get_display_aspect_ratio(SDTV_ASPECT_T aspect)
+    float get_display_aspect_ratio(SDTV_ASPECT_T aspect)
     {
       float display_aspect;
       switch (aspect) {
@@ -123,7 +123,7 @@ class Player{
       return display_aspect;
     }
 
-    static void FlushStreams(double pts)
+    void FlushStreams(double pts)
     {
       m_av_clock->OMXStop();
       m_av_clock->OMXPause();
@@ -145,7 +145,7 @@ class Player{
     }
 
 
-    static void blank_background(uint32_t rgba)
+    void blank_background(uint32_t rgba)
     {
       // if alpha is fully transparent then background has no effect
       if (!(rgba & 0xff000000))
