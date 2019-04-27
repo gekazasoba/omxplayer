@@ -72,7 +72,6 @@ enum PCMChannels  *m_pChannelMap        = NULL;
 volatile sig_atomic_t g_abort           = false;
 long              m_Volume              = 0;
 long              m_Amplification       = 0;
-bool              m_NativeDeinterlace   = false;
 bool              m_HWDecode            = false;
 bool              m_osd                 = true;
 std::string       m_font_path           = "/usr/share/fonts/truetype/freefont/FreeSans.ttf";
@@ -248,8 +247,6 @@ void SetVideoMode(int width, int height, int fpsrate, int fpsscale, FORMAT_3D_T 
   if (num_modes > 0 && prefer_group != HDMI_RES_GROUP_INVALID)
   {
     uint32_t best_score = 1<<30;
-    uint32_t scan_mode = m_NativeDeinterlace;
-
     for (i=0; i<num_modes; i++)
     {
       TV_SUPPORTED_MODE_NEW_T *tv = supported_modes + i;
@@ -280,11 +277,6 @@ void SetVideoMode(int width, int height, int fpsrate, int fpsscale, FORMAT_3D_T 
       // native is good
       if (!tv->native)
         score += 1<<16;
-
-      // interlace is bad
-      if (scan_mode != tv->scan_mode)
-        score += (1<<16);
-
       // wanting 3D but not getting it is a negative
       if (is3d == CONF_FLAGS_FORMAT_SBS && !(tv->struct_3d_mask & HDMI_3D_STRUCT_SIDE_BY_SIDE_HALF_HORIZONTAL))
         score += 1<<18;
@@ -296,9 +288,6 @@ void SetVideoMode(int width, int height, int fpsrate, int fpsscale, FORMAT_3D_T 
       // prefer square pixels modes
       float par = get_display_aspect_ratio((HDMI_ASPECT_T)tv->aspect_ratio)*(float)tv->height/(float)tv->width;
       score += fabs(par - 1.0f) * (1<<12);
-
-      /*printf("mode %dx%d@%d %s%s:%x par=%.2f score=%d\n", tv->width, tv->height, 
-             tv->frame_rate, tv->native?"N":"", tv->scan_mode?"I":"", tv->code, par, score);*/
 
       if (score < best_score)
       {
@@ -313,9 +302,6 @@ void SetVideoMode(int width, int height, int fpsrate, int fpsscale, FORMAT_3D_T 
     char response[80];
     printf("Output mode %d: %dx%d@%d %s%s:%x\n", tv_found->code, tv_found->width, tv_found->height,
            tv_found->frame_rate, tv_found->native?"N":"", tv_found->scan_mode?"I":"", tv_found->code);
-    if (m_NativeDeinterlace && tv_found->scan_mode)
-      vc_gencmd(response, sizeof response, "hvs_update_fields %d", 1);
-
     // if we are closer to ntsc version of framerate, let gpu know
     int ifps = (int)(fps+0.5f);
     bool ntsc_freq = fabs(fps*1001.0f/1000.0f - ifps) < fabs(fps-ifps);
@@ -448,10 +434,6 @@ int main(int argc, char *argv[])
   double                m_incr                = 0;
   CRBP                  g_RBP;
   COMXCore              g_OMX;
-  bool                  m_dump_format         = false;
-  bool                  m_dump_format_exit    = false;
-  FORMAT_3D_T           m_3d                  = CONF_FLAGS_FORMAT_NONE;
-  bool                  m_refresh             = false;
   double                startpts              = 0;
   uint32_t              m_blank_background    = 0;
   bool sentStarted = false;
@@ -507,10 +489,7 @@ int main(int argc, char *argv[])
   m_av_clock = new OMXClock();
   change_file:
 
-  if(!m_omx_reader.Open(m_filename.c_str(), m_dump_format, m_config_audio.is_live, m_timeout, m_cookie.c_str(), m_user_agent.c_str(), m_lavfdopts.c_str(), m_avdict.c_str()))
-    goto do_exit;
-
-  if (m_dump_format_exit)
+  if(!m_omx_reader.Open(m_filename.c_str(), false, m_config_audio.is_live, m_timeout, m_cookie.c_str(), m_user_agent.c_str(), m_lavfdopts.c_str(), m_avdict.c_str()))
     goto do_exit;
 
   m_has_video     = m_omx_reader.VideoStreamCount();
@@ -522,18 +501,7 @@ int main(int argc, char *argv[])
     m_has_video = false;
   }
 
-  if(m_filename.find("3DSBS") != string::npos || m_filename.find("HSBS") != string::npos)
-    m_3d = CONF_FLAGS_FORMAT_SBS;
-  else if(m_filename.find("3DTAB") != string::npos || m_filename.find("HTAB") != string::npos)
-    m_3d = CONF_FLAGS_FORMAT_TB;
-
-  // 3d modes don't work without switch hdmi mode
-  if (m_3d != CONF_FLAGS_FORMAT_NONE || m_NativeDeinterlace)
-    m_refresh = true;
-
   // you really don't want want to match refresh rate without hdmi clock sync
-  if ((m_refresh || m_NativeDeinterlace) && !m_no_hdmi_clock_sync)
-    m_config_video.hdmi_clock_sync = true;
 
   if(!m_av_clock->OMXInitialize())
     goto do_exit;
@@ -554,13 +522,6 @@ int main(int argc, char *argv[])
   if(m_audio_index_use > 0)
     m_omx_reader.SetActiveStream(OMXSTREAM_AUDIO, m_audio_index_use-1);
 
-  if(m_has_video && m_refresh)
-  {
-    memset(&tv_state, 0, sizeof(TV_DISPLAY_STATE_T));
-    m_BcmHost.vc_tv_get_display_state(&tv_state);
-
-    SetVideoMode(m_config_video.hints.width, m_config_video.hints.height, m_config_video.hints.fpsrate, m_config_video.hints.fpsscale, m_3d);
-  }
   // get display aspect
   TV_DISPLAY_STATE_T current_tv_state;
   memset(&current_tv_state, 0, sizeof(TV_DISPLAY_STATE_T));
@@ -894,16 +855,6 @@ do_exit:
   {
     unsigned t = (unsigned)(m_av_clock->OMXMediaTime()*1e-6);
     printf("Stopped at: %02d:%02d:%02d\n", (t/3600), (t/60)%60, t%60);
-  }
-
-  if (m_NativeDeinterlace)
-  {
-    char response[80];
-    vc_gencmd(response, sizeof response, "hvs_update_fields %d", 0);
-  }
-  if(m_has_video && m_refresh && tv_state.display.hdmi.group && tv_state.display.hdmi.mode)
-  {
-    m_BcmHost.vc_tv_hdmi_power_on_explicit_new(HDMI_MODE_HDMI, (HDMI_RES_GROUP_T)tv_state.display.hdmi.group, tv_state.display.hdmi.mode);
   }
 
   m_av_clock->OMXStop();
