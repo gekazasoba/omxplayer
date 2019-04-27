@@ -640,8 +640,7 @@ int main(int argc, char *argv[])
       else
         OMXClock::OMXSleep(10);
     }
-    else if(m_omx_pkt) &&
-            m_omx_pkt->codec_type == AVMEDIA_TYPE_SUBTITLE)
+    else if(m_omx_pkt && m_omx_pkt->codec_type == AVMEDIA_TYPE_SUBTITLE)
     {
       OMXClock::OMXSleep(10);
     }
