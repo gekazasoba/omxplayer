@@ -525,8 +525,7 @@ int main(int argc, char *argv[]) {
     player1.SpinAsync();
 
     player2.Pause(true);
-    printf("player 2 playing async (paused)\n");
-    player2.SpinAsync();
+
 
 
 
@@ -538,6 +537,9 @@ int main(int argc, char *argv[]) {
 
     printf("p1 stopping\n");
     player1.Stop();
+
+    printf("player 2 playing async (paused)\n");
+    player2.SpinAsync();
 
     printf("p2 unpausing\n");
     player2.Pause(false);
