@@ -511,23 +511,35 @@ int main(int argc, char *argv[]) {
     //printf("player 1 playing\n");
     //bool ok1 = player1.spin();
     player1.Pause(true);
-    printf("player 1 playing async (paused\n");
+    printf("player 1 playing async (paused)\n");
     player1.SpinAsync();
-    std::this_thread::sleep_for(std::chrono::seconds(3));
-    printf("unpausing 3 sec\n");
+
+    player2.Pause(true);
+    printf("player 2 playing async (paused)\n");
+    player2.SpinAsync();
+
+
+
+    printf("p1 unpausing\n");
     player1.Pause(false);
+    printf("p1 for 10 sec\n");
     std::this_thread::sleep_for(std::chrono::seconds(10));
 
 
-    printf("stopping\n");
+    printf("p1 stopping\n");
     player1.Stop();
+
+    printf("p2 unpausing\n");
+    player2.Pause(false);
 
     printf("player 1 clean up\n");
     player1.Cleanup();
 
-    printf("player 2 playing\n");
+    printf("p2 for 10 sec\n");
+    std::this_thread::sleep_for(std::chrono::seconds(10));
 
-    bool ok2 = player2.Spin();
+    printf("p2 stopping\n");
+    player2.Stop();
 
     player2.Cleanup();
 
