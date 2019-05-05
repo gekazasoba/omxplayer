@@ -489,7 +489,7 @@ public:
 
     std::shared_ptr<std::thread> thread;
     void SpinAsync(){
-        thread = std::shared_ptr<std::thread>(new std::thread(&Player::spin, this));
+        thread = std::shared_ptr<std::thread>(new std::thread(&Player::Spin, this));
     }
 };
 
