@@ -87,7 +87,7 @@ class Player {
     std::string m_filename;
     CRBP g_RBP;
     COMXCore g_OMX;
-    uint32_t m_blank_background = 0;//0xff000000;
+    uint32_t m_blank_background = 0xff000000;
     float m_threshold = -1.0f; // amount of audio/video required to come out of buffering
     float m_timeout = 10.0f; // amount of time file/network operation can stall for before timing out
 
@@ -343,6 +343,13 @@ public:
         if (m_threshold < 0.0f)
             m_threshold = m_config_audio.is_live ? 0.7f : 0.2f;
 
+
+        m_config_video.dst_rect.x1 = 100;
+        m_config_video.dst_rect.y1 = 200;
+        m_config_video.dst_rect.x2 = 700;
+        m_config_video.dst_rect.y2 = 800;
+        m_player_video.SetVideoRect(m_config_video.src_rect, m_config_video.dst_rect);
+
         m_av_clock->OMXReset(m_has_video, m_has_audio);
         m_av_clock->OMXStateExecute();
         return true;
@@ -528,8 +535,6 @@ int main(int argc, char *argv[]) {
 
     printf("p1 stopping\n");
     player1.Stop();
-
-    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     printf("p2 unpausing\n");
     player2.Pause(false);
