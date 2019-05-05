@@ -87,7 +87,7 @@ class Player {
     std::string m_filename;
     CRBP g_RBP;
     COMXCore g_OMX;
-    uint32_t m_blank_background = 0;
+    uint32_t m_blank_background = 0xff000000;
     float m_threshold = -1.0f; // amount of audio/video required to come out of buffering
     float m_timeout = 10.0f; // amount of time file/network operation can stall for before timing out
 
