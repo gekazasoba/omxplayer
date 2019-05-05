@@ -226,10 +226,6 @@ public:
         m_stop = true;
         thread->join();
     }
-
-    bool Stop(){
-        return m_stop;
-    }
 public:
     void Cleanup() {
         m_av_clock->OMXStop();
