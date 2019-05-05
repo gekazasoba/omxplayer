@@ -346,7 +346,7 @@ public:
         m_av_clock->OMXReset(m_has_video, m_has_audio);
         m_av_clock->OMXStateExecute();
 
-        m_config_video.aspectMode = 0;
+        m_config_video.aspectMode = 3;
         m_player_video.SetVideoRect(m_config_video.aspectMode);
         m_config_video.dst_rect.x1 = 100;
         m_config_video.dst_rect.y1 = 200;
