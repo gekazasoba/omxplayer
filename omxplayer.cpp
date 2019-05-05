@@ -357,8 +357,8 @@ public:
     }
 
     bool Spin() {
-        SetSize();
         while (!m_stop) {
+            SetSize();
             double now = m_av_clock->GetAbsoluteClock();
             bool update = false;
             if (m_last_check_time == 0.0 || m_last_check_time + DVD_MSEC_TO_TIME(20) <= now) {
