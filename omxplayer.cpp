@@ -253,12 +253,6 @@ public:
     }
 
     bool Init() {
-
-        m_config_video.dst_rect.x1 = 100;
-        m_config_video.dst_rect.y1 = 100;
-        m_config_video.dst_rect.x2 = 300;
-        m_config_video.dst_rect.y2 = 300;
-
         if (m_filename.find_last_of(".") != string::npos) {
             CStdString extension = m_filename.substr(m_filename.find_last_of("."));
             if (!extension.IsEmpty() && m_musicExtensions.Find(extension.ToLower()) != -1)
@@ -533,6 +527,9 @@ int main(int argc, char *argv[]) {
 
     printf("p1 unpausing\n");
     player1.Pause(false);
+
+    player1.SetSize();
+
     printf("p1 for 10 sec\n");
     std::this_thread::sleep_for(std::chrono::seconds(10));
 
