@@ -254,6 +254,11 @@ public:
 
     bool Init() {
 
+        m_config_video.dst_rect.x1 = 100;
+        m_config_video.dst_rect.y1 = 100;
+        m_config_video.dst_rect.x2 = 300;
+        m_config_video.dst_rect.y2 = 300;
+
         if (m_filename.find_last_of(".") != string::npos) {
             CStdString extension = m_filename.substr(m_filename.find_last_of("."));
             if (!extension.IsEmpty() && m_musicExtensions.Find(extension.ToLower()) != -1)
@@ -358,7 +363,6 @@ public:
 
     bool Spin() {
         while (!m_stop) {
-            SetSize();
             double now = m_av_clock->GetAbsoluteClock();
             bool update = false;
             if (m_last_check_time == 0.0 || m_last_check_time + DVD_MSEC_TO_TIME(20) <= now) {
