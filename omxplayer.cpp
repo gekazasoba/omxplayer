@@ -214,8 +214,24 @@ public:
 
     }
 
+    void Pause(bool pause) {
+        m_Pause = pause;
+    }
+
+    bool Pause(){
+        return m_Pause;
+    }
+
+    void Stop(){
+        m_stop = true;
+        thread->join();
+    }
+
+    bool Stop(){
+        return m_stop;
+    }
 public:
-    void cleanup() {
+    void Cleanup() {
         m_av_clock->OMXStop();
         m_av_clock->OMXStateIdle();
 
@@ -240,7 +256,7 @@ public:
         g_RBP.Deinitialize();
     }
 
-    bool init() {
+    bool Init() {
 
         if (m_filename.find_last_of(".") != string::npos) {
             CStdString extension = m_filename.substr(m_filename.find_last_of("."));
@@ -336,7 +352,7 @@ public:
         return true;
     }
 
-    bool spin() {
+    bool Spin() {
         while (!m_stop) {
             double now = m_av_clock->GetAbsoluteClock();
             bool update = false;
@@ -476,22 +492,22 @@ public:
     }
 
     std::shared_ptr<std::thread> thread;
-    void spin_async(){
+    void SpinAsync(){
         thread = std::shared_ptr<std::thread>(new std::thread(&Player::spin, this));
     }
 };
 
 
 int main(int argc, char *argv[]) {
-    Player player1("/opt/vc/src/hello_pi/hello_video/test.h264");
-    Player player2("/opt/vc/src/hello_pi/hello_video/test.h264");
+    Player player1("/home/pi/omi.mp4");
+    Player player2("/home/pi/shakira.mp4");
 
-    if (!player1.init()) {
+    if (!player1.Init()) {
         printf("player 1 init failed\n");
         return EXIT_FAILURE;
     }
 
-    if (!player2.init()) {
+    if (!player2.Init()) {
         printf("player 2 init failed\n");
         return EXIT_FAILURE;
     }
@@ -499,17 +515,29 @@ int main(int argc, char *argv[]) {
     //printf("player 1 playing\n");
     //bool ok1 = player1.spin();
     printf("player 1 playing async\n");
-    player1.spin_async();
-    printf("waiting 10 sec\n");
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    player1.SpinAsync();
+    printf("spinning 3 sec\n");
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    printf("pausing 3 sec\n");
+    player1.Pause(true);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    printf("unpausing\n");
+    player1.Pause(false);
+    printf("spinning 3 sec\n");
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    printf("stopping\n");
+    player1.Stop();
+
     printf("player 1 clean up\n");
-    player1.cleanup();
+    player1.Cleanup();
 
     printf("player 2 playing\n");
 
-    bool ok2 = player2.spin();
+    bool ok2 = player2.Spin();
 
-    player2.cleanup();
+    player2.Cleanup();
 
     printf("have a nice day ;)\n");
 
