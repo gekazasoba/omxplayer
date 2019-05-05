@@ -505,7 +505,7 @@ public:
 
 int main(int argc, char *argv[]) {
     Player player1("/home/pi/omi.mp4");
-    Player player2("/home/pi/shakira.mp4");
+    //Player player2("/home/pi/shakira.mp4");
 
     if (!player1.Init()) {
         printf("player 1 init failed\n");
@@ -513,19 +513,18 @@ int main(int argc, char *argv[]) {
     }
     player1.SetSize();
 
-    if (!player2.Init()) {
+    /*if (!player2.Init()) {
         printf("player 2 init failed\n");
         return EXIT_FAILURE;
-    }
+    }*/
 
-    //printf("player 1 playing\n");
-    //bool ok1 = player1.spin();
     player1.Pause(true);
     printf("player 1 playing async (paused)\n");
     player1.SpinAsync();
 
-    player2.Pause(true);
-
+/*    player2.Pause(true);
+    printf("player 2 playing async (paused)\n");
+    player2.SpinAsync();*/
 
 
 
@@ -538,22 +537,19 @@ int main(int argc, char *argv[]) {
     printf("p1 stopping\n");
     player1.Stop();
 
-    printf("player 2 playing async (paused)\n");
-    player2.SpinAsync();
-
-    printf("p2 unpausing\n");
-    player2.Pause(false);
+    /*printf("p2 unpausing\n");
+    player2.Pause(false);*/
 
     printf("player 1 clean up\n");
     player1.Cleanup();
 
-    printf("p2 for 10 sec\n");
+    /*printf("p2 for 10 sec\n");
     std::this_thread::sleep_for(std::chrono::seconds(10));
 
     printf("p2 stopping\n");
     player2.Stop();
 
-    player2.Cleanup();
+    player2.Cleanup();*/
 
     printf("have a nice day ;)\n");
 
