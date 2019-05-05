@@ -343,6 +343,8 @@ public:
         if (m_threshold < 0.0f)
             m_threshold = m_config_audio.is_live ? 0.7f : 0.2f;
 
+        m_av_clock->OMXReset(m_has_video, m_has_audio);
+        m_av_clock->OMXStateExecute();
 
         m_config_video.dst_rect.x1 = 100;
         m_config_video.dst_rect.y1 = 200;
@@ -350,12 +352,11 @@ public:
         m_config_video.dst_rect.y2 = 800;
         m_player_video.SetVideoRect(m_config_video.src_rect, m_config_video.dst_rect);
 
-        m_av_clock->OMXReset(m_has_video, m_has_audio);
-        m_av_clock->OMXStateExecute();
         return true;
     }
 
     bool Spin() {
+
         while (!m_stop) {
             double now = m_av_clock->GetAbsoluteClock();
             bool update = false;
