@@ -61,6 +61,9 @@ extern "C" {
 
 #include <string>
 #include <utility>
+#include <thread>
+#include <memory>
+#include <chrono>
 
 #include "version.h"
 
@@ -472,8 +475,9 @@ public:
         return true;
     }
 
+    std::shared_ptr<std::thread> thread;
     void spin_async(){
-
+        thread = std::shared_ptr<std::thread>(new std::thread(&Player::spin, this));
     }
 };
 
@@ -492,10 +496,13 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    printf("player 1 playing\n");
-
-    bool ok1 = player1.spin();
-
+    //printf("player 1 playing\n");
+    //bool ok1 = player1.spin();
+    printf("player 1 playing async\n");
+    player1.spin_async();
+    printf("waiting 10 sec\n");
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+    printf("player 1 clean up\n");
     player1.cleanup();
 
     printf("player 2 playing\n");
