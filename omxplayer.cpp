@@ -345,16 +345,15 @@ public:
 
         m_av_clock->OMXReset(m_has_video, m_has_audio);
         m_av_clock->OMXStateExecute();
+        return true;
+    }
 
-        m_config_video.aspectMode = 3;
-        m_player_video.SetVideoRect(m_config_video.aspectMode);
+    void SetSize(){
         m_config_video.dst_rect.x1 = 100;
         m_config_video.dst_rect.y1 = 100;
         m_config_video.dst_rect.x2 = 300;
         m_config_video.dst_rect.y2 = 300;
         m_player_video.SetVideoRect(m_config_video.src_rect, m_config_video.dst_rect);
-
-        return true;
     }
 
     bool Spin() {
@@ -512,6 +511,7 @@ int main(int argc, char *argv[]) {
         printf("player 1 init failed\n");
         return EXIT_FAILURE;
     }
+    player1.SetSize();
 
     if (!player2.Init()) {
         printf("player 2 init failed\n");
