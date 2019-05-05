@@ -357,7 +357,7 @@ public:
     }
 
     bool Spin() {
-
+        SetSize();
         while (!m_stop) {
             double now = m_av_clock->GetAbsoluteClock();
             bool update = false;
@@ -511,7 +511,6 @@ int main(int argc, char *argv[]) {
         printf("player 1 init failed\n");
         return EXIT_FAILURE;
     }
-    player1.SetSize();
 
     /*if (!player2.Init()) {
         printf("player 2 init failed\n");
