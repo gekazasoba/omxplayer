@@ -510,18 +510,14 @@ int main(int argc, char *argv[]) {
 
     //printf("player 1 playing\n");
     //bool ok1 = player1.spin();
-    printf("player 1 playing async\n");
-    player1.SpinAsync();
-    printf("spinning 3 sec\n");
-    std::this_thread::sleep_for(std::chrono::seconds(3));
-    printf("pausing 3 sec\n");
     player1.Pause(true);
+    printf("player 1 playing async (paused\n");
+    player1.SpinAsync();
     std::this_thread::sleep_for(std::chrono::seconds(3));
-
-    printf("unpausing\n");
+    printf("unpausing 3 sec\n");
     player1.Pause(false);
-    printf("spinning 3 sec\n");
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+
 
     printf("stopping\n");
     player1.Stop();
