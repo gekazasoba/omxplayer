@@ -345,20 +345,19 @@ public:
 
         m_av_clock->OMXReset(m_has_video, m_has_audio);
         m_av_clock->OMXStateExecute();
+
+        /*m_config_video.dst_rect.x1 = 100;
+        m_config_video.dst_rect.y1 = 200;
+        m_config_video.dst_rect.x2 = 700;
+        m_config_video.dst_rect.y2 = 800;*/
+        m_player_video.SetVideoRect(m_config_video.src_rect, m_config_video.dst_rect);
+
         return true;
     }
 
     bool Spin() {
 
         while (!m_stop) {
-
-            m_config_video.dst_rect.x1 = 100;
-            m_config_video.dst_rect.y1 = 200;
-            m_config_video.dst_rect.x2 = 700;
-            m_config_video.dst_rect.y2 = 800;
-            m_player_video.SetVideoRect(m_config_video.src_rect, m_config_video.dst_rect);
-
-
             double now = m_av_clock->GetAbsoluteClock();
             bool update = false;
             if (m_last_check_time == 0.0 || m_last_check_time + DVD_MSEC_TO_TIME(20) <= now) {
