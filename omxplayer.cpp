@@ -349,9 +349,9 @@ public:
         m_config_video.aspectMode = 3;
         m_player_video.SetVideoRect(m_config_video.aspectMode);
         m_config_video.dst_rect.x1 = 100;
-        m_config_video.dst_rect.y1 = 200;
-        m_config_video.dst_rect.x2 = 700;
-        m_config_video.dst_rect.y2 = 800;
+        m_config_video.dst_rect.y1 = 100;
+        m_config_video.dst_rect.x2 = 300;
+        m_config_video.dst_rect.y2 = 300;
         m_player_video.SetVideoRect(m_config_video.src_rect, m_config_video.dst_rect);
 
         return true;
